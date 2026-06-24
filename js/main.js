@@ -151,4 +151,89 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   renderProjects('all');
+
+  /* --- BorderGlow Effect (vanilla) --- */
+  function initBorderGlow(selector, options = {}) {
+    const config = {
+      glowColor: '0 0 65',
+      glowIntensity: 1.0,
+      coneSpread: 25,
+      colors: ['#555', '#888', '#bbb'],
+      fillOpacity: 0.35,
+      ...options
+    };
+
+    document.querySelectorAll(selector).forEach(el => {
+      if (el._glowInitialized) return;
+      el._glowInitialized = true;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'glow-card-wrapper';
+      el.parentNode.insertBefore(wrapper, el);
+      wrapper.appendChild(el);
+
+      const cardBg = getComputedStyle(el).backgroundColor;
+      wrapper.style.setProperty('--card-bg', cardBg || '#1A1A1A');
+
+      const { h, s, l } = (() => {
+        const m = config.glowColor.match(/([\d.]+)\s*([\d.]+)%?\s*([\d.]+)%?/);
+        return m ? { h: parseFloat(m[1]), s: parseFloat(m[2]), l: parseFloat(m[3]) } : { h: 0, s: 0, l: 65 };
+      })();
+      const base = `${h}deg ${s}% ${l}%`;
+      const opacities = [100, 60, 50, 40, 30, 20, 10];
+      const suffixes = ['', '-60', '-50', '-40', '-30', '-20', '-10'];
+      for (let i = 0; i < opacities.length; i++) {
+        wrapper.style.setProperty(`--glow-color${suffixes[i]}`, `hsl(${base} / ${Math.min(opacities[i] * config.glowIntensity, 100)}%)`);
+      }
+
+      const positions = ['80% 55%', '69% 34%', '8% 6%', '41% 38%', '86% 85%', '82% 18%', '51% 4%'];
+      const gKeys = ['one', 'two', 'three', 'four', 'five', 'six', 'seven'];
+      const colorMap = [0, 1, 2, 0, 1, 2, 1];
+      for (let i = 0; i < 7; i++) {
+        const c = config.colors[Math.min(colorMap[i], config.colors.length - 1)];
+        wrapper.style.setProperty(`--gradient-${gKeys[i]}`, `radial-gradient(at ${positions[i]}, ${c} 0px, transparent 50%)`);
+      }
+
+      const edgeLight = document.createElement('span');
+      edgeLight.className = 'edge-light';
+      wrapper.appendChild(edgeLight);
+
+      wrapper.addEventListener('pointermove', (e) => {
+        const rect = wrapper.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+        const dx = x - cx;
+        const dy = y - cy;
+        let kx = 1 / 0, ky = 1 / 0;
+        if (dx !== 0) kx = cx / Math.abs(dx);
+        if (dy !== 0) ky = cy / Math.abs(dy);
+        const edge = Math.min(Math.max(1 / Math.min(kx, ky), 0), 1);
+        let degrees = 0;
+        if (dx !== 0 || dy !== 0) {
+          degrees = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+          if (degrees < 0) degrees += 360;
+        }
+        wrapper.style.setProperty('--edge-proximity', `${(edge * 100).toFixed(3)}`);
+        wrapper.style.setProperty('--cursor-angle', `${degrees.toFixed(3)}deg`);
+      });
+    });
+  }
+
+  /* Apply BorderGlow to cards */
+  function applyGlowToCards() {
+    initBorderGlow('.skill-category', { colors: ['#444', '#777', '#aaa'] });
+    initBorderGlow('.project-card', { colors: ['#444', '#777', '#aaa'] });
+    initBorderGlow('.about-card', { colors: ['#444', '#777', '#aaa'] });
+    initBorderGlow('.contact-card', { colors: ['#444', '#777', '#aaa'] });
+  }
+  setTimeout(applyGlowToCards, 100);
+
+  /* Re-apply glow when project cards are re-rendered */
+  const origRender = renderProjects;
+  renderProjects = function(filter) {
+    origRender(filter);
+    setTimeout(() => initBorderGlow('.project-card', { colors: ['#444', '#777', '#aaa'] }), 200);
+  };
 });
