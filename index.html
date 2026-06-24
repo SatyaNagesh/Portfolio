@@ -143,16 +143,9 @@
         <h2>Main Achievements</h2>
         <p>7 flagship web apps live on GitHub Pages, plus AI/ML, CV & creative projects</p>
       </div>
-      <div class="project-filters" data-reveal>
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="featured">Featured</button>
-        <button class="filter-btn" data-filter="ai">AI/ML</button>
-        <button class="filter-btn" data-filter="web">Web Dev</button>
-        <button class="filter-btn" data-filter="cv">Computer Vision</button>
-        <button class="filter-btn" data-filter="creative">Creative</button>
-      </div>
-      <div class="projects-grid" id="projectsGrid">
-        <!-- Projects injected by JS -->
+      <div id="domeGallery" class="sphere-root" style="height:580px;"></div>
+      <div style="text-align:center;margin-top:12px;">
+        <span style="font-family:JetBrains Mono;font-size:0.65rem;color:var(--text-dim);letter-spacing:1px;">Drag to explore · Click to view details</span>
       </div>
     </div>
   </section>
@@ -278,6 +271,7 @@
   </section>
 
   <script src="js/projects.js"></script>
+  <script src="js/dome-gallery.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
