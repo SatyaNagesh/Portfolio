@@ -974,45 +974,25 @@ a { color: inherit; text-decoration: none; }
     padding: 80px 16px;
   }
 
-  .gooey-nav-wrap {
+  .nav-links {
     position: fixed;
     top: 64px;
     left: 0;
     right: 0;
     background: rgba(10,10,10,0.98);
     backdrop-filter: blur(20px);
+    flex-direction: column;
     padding: 16px;
+    gap: 4px;
     transform: translateY(-100%);
     opacity: 0;
     transition: var(--transition);
     border-bottom: 1px solid var(--border);
-    z-index: 100;
   }
 
-  .gooey-nav-wrap.open {
+  .nav-links.open {
     transform: translateY(0);
     opacity: 1;
-  }
-
-  .gooey-nav-wrap .gooey-nav ul {
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .gooey-nav-wrap .gooey-nav ul li.active a {
-    color: var(--text-primary);
-    background: rgba(255,255,255,0.05);
-    border-radius: 6px;
-  }
-
-  .gooey-nav-wrap .effect {
-    display: none;
-  }
-
-  .nav-links {
-    display: flex;
-    list-style: none;
-    gap: 4px;
   }
 
   .nav-toggle {
