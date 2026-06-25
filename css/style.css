@@ -1299,7 +1299,7 @@ a { color: inherit; text-decoration: none; }
     var(--gradient-seven) border-box,
     var(--gradient-base) border-box;
 
-  opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+  opacity: calc(0.1 + 0.5 * (var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
 
   mask-image:
     conic-gradient(
@@ -1317,6 +1317,21 @@ a { color: inherit; text-decoration: none; }
       transparent calc((100 - var(--cone-spread) - 15) * 1%),
       black calc((100 - var(--cone-spread)) * 1%)
     );
+}
+
+.glow-card-wrapper::after {
+  background:
+    var(--gradient-one) padding-box,
+    var(--gradient-two) padding-box,
+    var(--gradient-three) padding-box,
+    var(--gradient-four) padding-box,
+    var(--gradient-five) padding-box,
+    var(--gradient-six) padding-box,
+    var(--gradient-seven) padding-box,
+    var(--gradient-base, linear-gradient(#777 0 100%)) padding-box;
+
+  opacity: calc(0.2 + 0.5 * var(--edge-proximity) / 100);
+  mix-blend-mode: plus-lighter;
 }
 
 .glow-card-wrapper > .edge-light {
