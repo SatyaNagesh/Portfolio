@@ -180,21 +180,24 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyGlowToCards() {
     initBorderGlow('.skill-category', {
       colors: ['#c084fc', '#f472b6', '#38bdf8'],
-      glowColor: '0 0 85',
-      glowIntensity: 1,
-      coneSpread: 25
+      glowColor: '270 95 75',
+      glowIntensity: 1.2,
+      coneSpread: 25,
+      fillOpacity: 0.5
     });
     initBorderGlow('.about-card', {
       colors: ['#c084fc', '#f472b6', '#38bdf8'],
-      glowColor: '0 0 85',
-      glowIntensity: 1,
-      coneSpread: 25
+      glowColor: '270 95 75',
+      glowIntensity: 1.2,
+      coneSpread: 25,
+      fillOpacity: 0.5
     });
     initBorderGlow('.contact-card', {
       colors: ['#c084fc', '#f472b6', '#38bdf8'],
-      glowColor: '0 0 85',
-      glowIntensity: 1,
-      coneSpread: 25
+      glowColor: '270 95 75',
+      glowIntensity: 1.2,
+      coneSpread: 25,
+      fillOpacity: 0.5
     });
   }
   setTimeout(applyGlowToCards, 100);
