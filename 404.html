@@ -31,17 +31,25 @@
       background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
       background-size: 60px 60px;
     }
-    canvas { display: block; position: relative; z-index: 1; }
+    .fuzzy-frame {
+      position: relative;
+      z-index: 1;
+      width: 90vw;
+      max-width: 900px;
+      height: 300px;
+      border: none;
+      pointer-events: auto;
+    }
     .subtitle {
       position: relative; z-index: 1;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.85rem; color: #666; letter-spacing: 0.5px;
-      margin-top: 24px; text-align: center;
+      margin-top: 8px; text-align: center;
     }
     .back-link {
       display: inline-flex; align-items: center; gap: 6px;
       position: relative; z-index: 1;
-      margin-top: 40px;
+      margin-top: 32px;
       font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 500;
       color: #888; text-decoration: none;
       padding: 10px 24px; border: 1px solid #222; border-radius: 8px;
@@ -54,153 +62,11 @@
 <body>
   <div class="noise" aria-hidden="true"></div>
   <div class="grid-bg" aria-hidden="true"></div>
-  <canvas id="fuzzyCanvas"></canvas>
+  <iframe src="fuzzytext/index.html" class="fuzzy-frame" title="404" loading="eager" aria-hidden="true"></iframe>
   <p class="subtitle">PAGE NOT FOUND</p>
   <a href="./" class="back-link">
     <svg viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     Back to Home
   </a>
-  <script>
-    (function() {
-      const canvas = document.getElementById('fuzzyCanvas');
-      const ctx = canvas.getContext('2d');
-
-      const text = '404';
-      const color = '#ffffff';
-      const baseIntensity = 0.18;
-      const hoverIntensity = 0.6;
-      const fuzzRange = 30;
-      const fps = 60;
-      const direction = 'both';
-      const frameDuration = 1000 / fps;
-
-      const fontFamily = "'JetBrains Mono', monospace";
-      const fontSize = 'clamp(4rem, 20vw, 14rem)';
-      const fontWeight = 900;
-
-      let numericFontSize;
-      let offscreen, offCtx;
-      let offscreenWidth, tightHeight;
-      let isHovering = false;
-      let currentIntensity = baseIntensity;
-      let targetIntensity = baseIntensity;
-      let animationId;
-      let lastFrameTime = 0;
-
-      let isGlitching = false;
-      let glitchTimeout, glitchEndTimeout;
-      const glitchMode = true;
-      const glitchInterval = 2500;
-      const glitchDuration = 200;
-
-      function measureFont() {
-        const temp = document.createElement('span');
-        temp.style.fontSize = fontSize;
-        temp.style.fontFamily = fontFamily;
-        temp.style.fontWeight = fontWeight;
-        document.body.appendChild(temp);
-        numericFontSize = parseFloat(window.getComputedStyle(temp).fontSize);
-        document.body.removeChild(temp);
-      }
-
-      function buildOffscreen() {
-        const fontStr = `${fontWeight} ${numericFontSize}px ${fontFamily}`;
-        offscreen = document.createElement('canvas');
-        offCtx = offscreen.getContext('2d');
-        offCtx.font = fontStr;
-        offCtx.textBaseline = 'alphabetic';
-
-        const metrics = offCtx.measureText(text);
-        const actualLeft = metrics.actualBoundingBoxLeft || 0;
-        const actualRight = metrics.actualBoundingBoxRight || metrics.width;
-        const actualAscent = metrics.actualBoundingBoxAscent || numericFontSize;
-        const actualDescent = metrics.actualBoundingBoxDescent || numericFontSize * 0.2;
-
-        const textWidth = Math.ceil(actualLeft + actualRight);
-        tightHeight = Math.ceil(actualAscent + actualDescent);
-        const buf = 10;
-        offscreenWidth = textWidth + buf * 2;
-
-        offscreen.width = offscreenWidth;
-        offscreen.height = tightHeight;
-
-        offCtx.font = fontStr;
-        offCtx.textBaseline = 'alphabetic';
-        offCtx.fillStyle = color;
-        offCtx.fillText(text, buf - actualLeft, actualAscent);
-
-        const hm = fuzzRange + 20;
-        canvas.width = offscreenWidth + hm * 2;
-        canvas.height = tightHeight;
-        canvas.style.width = canvas.width + 'px';
-        canvas.style.height = canvas.height + 'px';
-      }
-
-      function startGlitch() {
-        glitchTimeout = setTimeout(() => {
-          isGlitching = true;
-          glitchEndTimeout = setTimeout(() => {
-            isGlitching = false;
-            startGlitch();
-          }, glitchDuration);
-        }, glitchInterval);
-      }
-
-      function run(timestamp) {
-        if (timestamp - lastFrameTime < frameDuration) {
-          animationId = requestAnimationFrame(run);
-          return;
-        }
-        lastFrameTime = timestamp;
-
-        const hm = fuzzRange + 20;
-        ctx.clearRect(-hm, -fuzzRange - 10, offscreenWidth + 2 * hm, tightHeight + 2 * (fuzzRange + 10));
-
-        if (isGlitching) targetIntensity = 1.0;
-        else if (isHovering) targetIntensity = hoverIntensity;
-        else targetIntensity = baseIntensity;
-
-        currentIntensity += (targetIntensity - currentIntensity) * 0.12;
-
-        if (direction === 'horizontal' || direction === 'both') {
-          for (let j = 0; j < tightHeight; j++) {
-            const dx = Math.floor(currentIntensity * (Math.random() - 0.5) * fuzzRange);
-            ctx.drawImage(offscreen, 0, j, offscreenWidth, 1, dx, j, offscreenWidth, 1);
-          }
-        }
-        if (direction === 'vertical' || direction === 'both') {
-          const data = ctx.getImageData(0, 0, offscreenWidth + fuzzRange, tightHeight + fuzzRange);
-          ctx.clearRect(-hm, -fuzzRange - 10, offscreenWidth + 2 * hm, tightHeight + 2 * (fuzzRange + 10));
-          ctx.putImageData(data, 0, 0);
-          for (let i = 0; i < offscreenWidth + fuzzRange; i++) {
-            const dy = Math.floor(currentIntensity * (Math.random() - 0.5) * fuzzRange * 0.5);
-            const colData = ctx.getImageData(i, 0, 1, tightHeight + fuzzRange);
-            ctx.clearRect(i, -fuzzRange, 1, tightHeight + 2 * fuzzRange);
-            ctx.putImageData(colData, i, dy);
-          }
-        }
-
-        animationId = requestAnimationFrame(run);
-      }
-
-      function handleResize() {
-        cancelAnimationFrame(animationId);
-        clearTimeout(glitchTimeout);
-        clearTimeout(glitchEndTimeout);
-        measureFont();
-        buildOffscreen();
-        if (glitchMode) startGlitch();
-        animationId = requestAnimationFrame(run);
-      }
-
-      canvas.addEventListener('mouseenter', () => isHovering = true);
-      canvas.addEventListener('mouseleave', () => isHovering = false);
-      canvas.addEventListener('touchstart', () => isHovering = true, { passive: true });
-      canvas.addEventListener('touchend', () => isHovering = false, { passive: true });
-
-      window.addEventListener('resize', handleResize);
-      handleResize();
-    })();
-  </script>
 </body>
 </html>
