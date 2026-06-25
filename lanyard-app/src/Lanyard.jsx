@@ -119,9 +119,9 @@ function Band({
   const backTex = useTexture(backImage || BLANK_PIXEL);
 
   const cardMap = useMemo(() => {
-    if (!frontImage && !backImage) return materials.base.map;
-
     const baseMap = materials.base.map;
+    if (!frontImage && !backImage) return baseMap;
+
     const baseImg = baseMap.image;
     const W = baseImg.width;
     const H = baseImg.height;
@@ -130,12 +130,7 @@ function Band({
     canvas.height = H;
     const ctx = canvas.getContext('2d');
     if (!ctx) return baseMap;
-
-    const grad = ctx.createLinearGradient(0, 0, W, H);
-    grad.addColorStop(0, '#1a1a2e');
-    grad.addColorStop(1, '#0f0f1a');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(baseImg, 0, 0, W, H);
 
     const drawFitted = (img, rect) => {
       const rx = rect.x * W;
