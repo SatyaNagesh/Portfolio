@@ -27,6 +27,7 @@ export default function Lanyard({
   frontImage = null,
   backImage = null,
   imageFit = 'cover',
+  lanyardImage = null,
   lanyardWidth = 1
 }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
@@ -47,13 +48,14 @@ export default function Lanyard({
       >
         <ambientLight intensity={Math.PI} />
         <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60}>
-            <Band
-              isMobile={isMobile}
-              frontImage={frontImage}
-              backImage={backImage}
-              imageFit={imageFit}
-              lanyardWidth={lanyardWidth}
-            />
+          <Band
+            isMobile={isMobile}
+            frontImage={frontImage}
+            backImage={backImage}
+            imageFit={imageFit}
+            lanyardImage={lanyardImage}
+            lanyardWidth={lanyardWidth}
+          />
         </Physics>
         <Environment blur={0.75}>
           <Lightformer
@@ -96,6 +98,7 @@ function Band({
   frontImage = null,
   backImage = null,
   imageFit = 'cover',
+  lanyardImage = null,
   lanyardWidth = 1
 }) {
   const band = useRef(),
@@ -110,6 +113,31 @@ function Band({
     dir = new THREE.Vector3();
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 };
   const { nodes, materials } = useGLTF(cardGLB);
+  const texture = useMemo(() => {
+    if (lanyardImage) return useTexture(lanyardImage);
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#555';
+    ctx.fillRect(0, 0, 64, 64);
+    for (let i = -64; i < 128; i += 8) {
+      ctx.strokeStyle = '#777';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + 16, 64);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + 12, 64);
+      ctx.stroke();
+    }
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.needsUpdate = true;
+    return tex;
+  }, [lanyardImage]);
   const frontTex = useTexture(frontImage || BLANK_PIXEL);
   const backTex = useTexture(backImage || BLANK_PIXEL);
 
@@ -253,9 +281,12 @@ function Band({
       <mesh ref={band}>
         <meshLineGeometry />
         <meshLineMaterial
-          color="black"
+          color="white"
           depthTest={false}
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
+          useMap
+          map={texture}
+          repeat={[-4, 1]}
           lineWidth={lanyardWidth}
         />
       </mesh>
