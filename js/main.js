@@ -161,9 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* Apply BorderGlow to cards */
   function applyGlowToCards() {
-    initBorderGlow('.skill-category', { colors: ['#444', '#777', '#aaa'] });
-    initBorderGlow('.about-card', { colors: ['#444', '#777', '#aaa'] });
-    initBorderGlow('.contact-card', { colors: ['#444', '#777', '#aaa'] });
+    initBorderGlow('.skill-category', { colors: ['#c084fc', '#f472b6', '#38bdf8'] });
+    initBorderGlow('.about-card', { colors: ['#c084fc', '#f472b6', '#38bdf8'] });
+    initBorderGlow('.contact-card', { colors: ['#c084fc', '#f472b6', '#38bdf8'] });
   }
   setTimeout(applyGlowToCards, 100);
 });
