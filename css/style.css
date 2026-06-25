@@ -1047,7 +1047,7 @@ a { color: inherit; text-decoration: none; }
   position: relative;
   width: 100%;
   height: 600px;
-  --radius: 520px;
+  --radius: 1200px;
   --viewer-pad: 72px;
   --circ: calc(var(--radius) * 3.14);
   --rot-y: calc((360deg / var(--segments-x, 35)) / 2);
