@@ -1,118 +1,88 @@
 (function() {
-  const GRID = 50;
-  const TRAIL_SIZE = 0.12;
-  const MAX_AGE = 450;
-  const INTERPOLATE = 0.15;
-  const COLOR = '#b1b0b5';
+  const gridSize = 50;
+  const color = '#b1b0b5';
 
   const canvas = document.createElement('canvas');
-  canvas.className = 'pixeltrail-canvas';
-  Object.assign(canvas.style, {
-    position: 'fixed', inset: '0', width: '100vw', height: '100vh',
-    zIndex: '0', pointerEvents: 'none', display: 'block'
-  });
-  document.body.prepend(canvas);
-
-  const svgNS = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(svgNS, 'svg');
-  Object.assign(svg.style, { position: 'fixed', inset: '0', width: '0', height: '0', overflow: 'hidden' });
-  const defs = document.createElementNS(svgNS, 'defs');
-  const filter = document.createElementNS(svgNS, 'filter');
-  filter.setAttribute('id', 'pixeltrail-goo');
-  const blur = document.createElementNS(svgNS, 'feGaussianBlur');
-  blur.setAttribute('in', 'SourceGraphic');
-  blur.setAttribute('stdDeviation', '2');
-  blur.setAttribute('result', 'blur');
-  filter.appendChild(blur);
-  const cm = document.createElementNS(svgNS, 'feColorMatrix');
-  cm.setAttribute('in', 'blur');
-  cm.setAttribute('type', 'matrix');
-  cm.setAttribute('values', '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9');
-  cm.setAttribute('result', 'goo');
-  filter.appendChild(cm);
-  const comp = document.createElementNS(svgNS, 'feComposite');
-  comp.setAttribute('in', 'SourceGraphic');
-  comp.setAttribute('in2', 'goo');
-  comp.setAttribute('operator', 'atop');
-  filter.appendChild(comp);
-  defs.appendChild(filter);
-  svg.appendChild(defs);
-  document.body.prepend(svg);
-  canvas.style.filter = 'url(#pixeltrail-goo)';
+  canvas.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;display:block';
+  document.body.insertBefore(canvas, document.body.firstChild);
 
   const ctx = canvas.getContext('2d');
-  let W, H;
-  let mx = -1000, my = -1000;
-  let px = -1000, py = -1000;
+
+  let W, H, mx = -1000, my = -1000;
 
   function resize() {
+    const dpr = devicePixelRatio || 1;
     W = window.innerWidth;
     H = window.innerHeight;
-    canvas.width = W * devicePixelRatio;
-    canvas.height = H * devicePixelRatio;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
     canvas.style.width = W + 'px';
     canvas.style.height = H + 'px';
-    ctx.scale(devicePixelRatio, devicePixelRatio);
+    ctx.scale(dpr, dpr);
   }
   resize();
   window.addEventListener('resize', resize);
 
-  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-  document.addEventListener('touchmove', e => {
-    const t = e.touches[0];
-    mx = t.clientX; my = t.clientY;
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX;
+    my = e.clientY;
+  });
+
+  document.addEventListener('touchmove', function(e) {
+    var t = e.touches[0];
+    mx = t.clientX;
+    my = t.clientY;
   }, { passive: true });
-  document.addEventListener('touchend', () => { mx = -1000; my = -1000; }, { passive: true });
 
-  const trailCanvas = document.createElement('canvas');
-  const trailCtx = trailCanvas.getContext('2d');
+  document.addEventListener('touchend', function() {
+    mx = -1000;
+    my = -1000;
+  }, { passive: true });
 
-  function initTrail() {
-    trailCanvas.width = W;
-    trailCanvas.height = H;
-    trailCtx.fillStyle = 'rgba(0,0,0,0)';
-    trailCtx.fillRect(0, 0, W, H);
-  }
-  initTrail();
-
-  function lerp(a, b, t) { return a + (b - a) * t; }
-
-  function draw(time) {
-    px = lerp(px, mx, INTERPOLATE);
-    py = lerp(py, my, INTERPOLATE);
-
-    trailCtx.fillStyle = 'rgba(0,0,0,' + (1 / MAX_AGE * 2) + ')';
-    trailCtx.fillRect(0, 0, W, H);
-
-    if (px > 0 && py > 0) {
-      trailCtx.fillStyle = 'rgba(255,255,255,1)';
-      const r = TRAIL_SIZE * Math.min(W, H) * 0.5;
-      trailCtx.beginPath();
-      trailCtx.arc(px, py, r, 0, Math.PI * 2);
-      trailCtx.fill();
-    }
-
+  function frame() {
     ctx.clearRect(0, 0, W, H);
 
-    const imageData = trailCtx.getImageData(0, 0, W, H);
-    const data = imageData.data;
+    if (mx < 0 || my < 0) {
+      requestAnimationFrame(frame);
+      return;
+    }
 
-    ctx.fillStyle = COLOR;
-    for (let y = 0; y < H; y += GRID) {
-      for (let x = 0; x < W; x += GRID) {
-        const idx = (y * W + x) * 4;
-        const brightness = data[idx] / 255;
-        if (brightness > 0.01) {
-          const size = 2 * brightness;
-          ctx.globalAlpha = brightness * 0.8;
-          ctx.fillRect(x - size / 2, y - size / 2, size, size);
+    ctx.fillStyle = color;
+
+    var gx = Math.round(mx / gridSize) * gridSize;
+    var gy = Math.round(my / gridSize) * gridSize;
+
+    var dist = Math.sqrt(Math.pow(mx - gx, 2) + Math.pow(my - gy, 2));
+    var maxDist = gridSize * 0.6;
+    var intensity = Math.max(0, 1 - dist / maxDist);
+    intensity = Math.min(intensity * 1.5, 1);
+
+    if (intensity > 0.05) {
+      ctx.globalAlpha = intensity * 0.8;
+      var s = 2 + intensity * 4;
+      ctx.fillRect(gx - s / 2, gy - s / 2, s, s);
+    }
+
+    var nearby = 2;
+    for (var dy = -nearby; dy <= nearby; dy++) {
+      for (var dx = -nearby; dx <= nearby; dx++) {
+        if (dx === 0 && dy === 0) continue;
+        var nx = gx + dx * gridSize;
+        var ny = gy + dy * gridSize;
+        if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
+        var d2 = Math.sqrt(Math.pow(mx - nx, 2) + Math.pow(my - ny, 2));
+        var i2 = Math.max(0, 1 - d2 / (gridSize * 2));
+        if (i2 > 0.05) {
+          ctx.globalAlpha = i2 * 0.5;
+          var s2 = Math.max(1, i2 * 3);
+          ctx.fillRect(nx - s2 / 2, ny - s2 / 2, s2, s2);
         }
       }
     }
-    ctx.globalAlpha = 1;
 
-    requestAnimationFrame(draw);
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(frame);
   }
 
-  requestAnimationFrame(draw);
+  requestAnimationFrame(frame);
 })();
