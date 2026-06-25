@@ -1065,6 +1065,8 @@ a { color: inherit; text-decoration: none; }
 .projects .container {
   position: relative;
   z-index: 2;
+  max-width: none;
+  margin-left: 0;
 }
 
 .projects #domeGallery {
