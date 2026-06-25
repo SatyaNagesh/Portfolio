@@ -13,6 +13,16 @@ function Loader() {
   return <Html center><span style={{ color: '#888', fontFamily: 'monospace', fontSize: 12 }}>{Math.round(progress)}%</span></Html>
 }
 
+function DebugInfo({ children }) {
+  return (
+    <Html center>
+      <div style={{ background: '#111', color: '#0f0', fontFamily: 'monospace', fontSize: 11, padding: 12, borderRadius: 6, maxWidth: 300, lineHeight: 1.5 }}>
+        {children}
+      </div>
+    </Html>
+  )
+}
+
 export default function Lanyard({
   position = [0, 0, 30],
   fov = 20,
@@ -39,8 +49,9 @@ export default function Lanyard({
         style={{ width: '100%', height: '100%' }}
       >
         <ambientLight intensity={2} />
-        <directionalLight position={[5, 10, 5]} intensity={1.5} />
-        <directionalLight position={[-5, -5, 5]} intensity={0.5} />
+        <directionalLight position={[5, 10, 5]} intensity={2} />
+        <directionalLight position={[-5, -5, 5]} intensity={1} />
+        <directionalLight position={[0, 0, 10]} intensity={1} />
         <Suspense fallback={<Loader />}>
           <Band isMobile={isMobile} frontImage={frontImage} backImage={backImage} imageFit={imageFit} />
         </Suspense>
@@ -186,19 +197,44 @@ function Band({ isMobile = false, frontImage = null, backImage = null, imageFit 
 
   const sc = isMobile ? 1.6 : 2.25
 
+  const nodeKeys = Object.keys(nodes)
+  const matKeys = Object.keys(materials)
   const cardGeo = nodes.card?.geometry
   const clipGeo = nodes.clip?.geometry
   const clampGeo = nodes.clamp?.geometry
   const metalMat = materials.metal
 
   if (!cardGeo) {
-    return <Html center><span style={{ color: '#f44', fontFamily: 'monospace', fontSize: 12 }}>card.glb: no geometry</span></Html>
+    return (
+      <DebugInfo>
+        <div style={{ color: '#f44' }}>No card geometry</div>
+        <div>nodes: {nodeKeys.join(', ')}</div>
+        <div>materials: {matKeys.join(', ')}</div>
+      </DebugInfo>
+    )
   }
 
   return (
     <>
+      <DebugInfo>
+        <div>card: {cardGeo.type}</div>
+        <div>clip: {clipGeo ? clipGeo.type : 'none'}</div>
+        <div>clamp: {clampGeo ? clampGeo.type : 'none'}</div>
+        <div>materials: {matKeys.join(', ')}</div>
+        <div>nodes: {nodeKeys.join(', ')}</div>
+        <div>cardMap: {cardMap ? 'yes' : 'null'}</div>
+        <div>pos: {pos.current.x.toFixed(2)}, {pos.current.y.toFixed(2)}</div>
+      </DebugInfo>
+      <mesh position={[0, 1.5, 0]}>
+        <boxGeometry args={[0.5, 0.5, 0.5]} />
+        <meshStandardMaterial color="#00ff88" emissive="#00ff88" emissiveIntensity={0.5} />
+      </mesh>
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[0.2, 16, 16]} />
+        <meshStandardMaterial color="#ff4488" emissive="#ff4488" emissiveIntensity={0.5} />
+      </mesh>
       <line ref={bandRef} geometry={bandGeo}>
-        <lineBasicMaterial color="#aaaaaa" transparent opacity={0.5} />
+        <lineBasicMaterial color="#ffffff" transparent opacity={0.8} />
       </line>
       <group
         ref={cardRef}
@@ -221,8 +257,11 @@ function Band({ isMobile = false, frontImage = null, backImage = null, imageFit 
             map-anisotropy={16}
             clearcoat={isMobile ? 0 : 1}
             clearcoatRoughness={0.15}
-            roughness={0.9}
-            metalness={0.8}
+            roughness={0.3}
+            metalness={0.1}
+            color="#ffffff"
+            emissive="#ffffff"
+            emissiveIntensity={0.2}
           />
         </mesh>
         {clipGeo && <mesh geometry={clipGeo} material={metalMat} material-roughness={0.3} />}
