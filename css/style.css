@@ -1347,26 +1347,7 @@ a { color: inherit; text-decoration: none; }
     var(--gradient-seven) padding-box,
     var(--gradient-base, linear-gradient(#777 0 100%)) padding-box;
 
-  mask-image:
-    linear-gradient(to bottom, black, black),
-    radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
-    radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
-    radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
-    radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
-    radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
-    conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
-  -webkit-mask-image:
-    linear-gradient(to bottom, black, black),
-    radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
-    radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
-    radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
-    radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
-    radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
-    conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
-
-  mask-composite: subtract, add, add, add, add, add;
-  -webkit-mask-composite: xor, add, add, add, add, add;
-  opacity: calc(0.15 + 0.6 * var(--edge-proximity) / 100);
+  opacity: calc(0.2 + 0.5 * var(--edge-proximity) / 100);
   mix-blend-mode: plus-lighter;
 }
 
