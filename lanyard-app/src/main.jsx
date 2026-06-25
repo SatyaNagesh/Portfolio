@@ -6,6 +6,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <Lanyard
     position={[0, 0, 30]}
     gravity={[0, -40, 0]}
-    frontImage="/profile.png"
+    frontImage="./profile.png"
   />
 )
