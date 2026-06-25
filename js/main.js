@@ -87,6 +87,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let gooeyNavWrap = null;
   if (navUl) {
     gooeyNavWrap = initGooeyNav(navUl.parentElement, {
+      particleCount: 10,
+      timeVariance: 400,
+      particleR: 1000,
+      colors: [4],
       onActiveChange: (index) => {
         const lis = navUl.querySelectorAll('li');
         const link = lis[index]?.querySelector('a');
