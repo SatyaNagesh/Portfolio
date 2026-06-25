@@ -87,13 +87,9 @@ loader.load('lanyard/card.glb', (gltf) => {
   scene.add(cardGroup)
 })
 
-const segs = 33
-const bandPositions = new Float32Array(segs * 3)
-const bandGeo = new THREE.BufferGeometry()
-bandGeo.setAttribute('position', new THREE.BufferAttribute(bandPositions, 3))
-const bandMat = new THREE.LineBasicMaterial({ color: 0xcccccc, transparent: true, opacity: 0.6 })
-const bandLine = new THREE.Line(bandGeo, bandMat)
-scene.add(bandLine)
+const tubeRadius = 0.035
+const tubeMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.6, metalness: 0.1 })
+let tubeMesh = null
 
 const dragging = { active: false }
 const pointerWorld = new THREE.Vector3()
@@ -133,6 +129,9 @@ setTimeout(resize, 100)
 
 const upVec = new THREE.Vector3(0, 1, 0)
 const tmpQuat = new THREE.Quaternion()
+const p1 = new THREE.Vector3()
+const p2 = new THREE.Vector3()
+const p3 = new THREE.Vector3()
 
 function animate() {
   requestAnimationFrame(animate)
@@ -159,20 +158,24 @@ function animate() {
     tmpQuat.setFromUnitVectors(upVec, dirFromAnchor)
     cardGroup.quaternion.slerp(tmpQuat, 0.15)
   }
-  const positions = bandLine.geometry.attributes.position.array
-  for (let i = 0; i < segs; i++) {
-    const t = i / (segs - 1)
-    const c1x = (connectPos.x - anchor.x) * 0.3 + 0.15
-    const c1y = (connectPos.y - anchor.y) * 0.3
-    const c2x = (connectPos.x - anchor.x) * 0.7 - 0.1
-    const c2y = (connectPos.y - anchor.y) * 0.7
-    const tt = t * t
-    const tp = 1 - t
-    positions[i * 3] = tp * tp * t * anchor.x + 3 * tp * t * t * (anchor.x + c1x) + 3 * tp * tt * (anchor.x + c2x) + tt * t * connectPos.x
-    positions[i * 3 + 1] = tp * tp * t * anchor.y + 3 * tp * t * t * (anchor.y + c1y) + 3 * tp * tt * (anchor.y + c2y) + tt * t * connectPos.y
-    positions[i * 3 + 2] = 0
+
+  const cp = connectPos
+  const midY = (anchor.y + cp.y) / 2
+  const midX = (anchor.x + cp.x) / 2 + 0.15
+  const midZ = (anchor.z + cp.z) / 2 + 0.1
+  p1.set(anchor.x, anchor.y, anchor.z)
+  p2.set(midX, midY, midZ)
+  p3.set(cp.x, cp.y, cp.z)
+  const curve = new THREE.QuadraticBezierCurve3(p1, p2, p3)
+  const newGeo = new THREE.TubeGeometry(curve, 16, tubeRadius, 6, false)
+  if (tubeMesh) {
+    tubeMesh.geometry.dispose()
+    tubeMesh.geometry = newGeo
+  } else {
+    tubeMesh = new THREE.Mesh(newGeo, tubeMat)
+    scene.add(tubeMesh)
   }
-  bandLine.geometry.attributes.position.needsUpdate = true
+
   renderer.render(scene, camera)
 }
 animate()
