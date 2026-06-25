@@ -4,6 +4,8 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { shaderMaterial, useTrailTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
+import './PixelTrail.css';
+
 const GooeyFilter = ({ id = 'goo-filter', strength = 10 }) => {
   return (
     <svg className="goo-filter-container">
@@ -61,7 +63,7 @@ const DotMaterial = shaderMaterial(
   `
 );
 
-function Scene({ gridSize, trailSize, maxAge, interpolate, pixelColor }) {
+function Scene({ gridSize, trailSize, maxAge, interpolate, easingFunction, pixelColor }) {
   const size = useThree(s => s.size);
   const viewport = useThree(s => s.viewport);
 
@@ -73,7 +75,7 @@ function Scene({ gridSize, trailSize, maxAge, interpolate, pixelColor }) {
     radius: trailSize,
     maxAge: maxAge,
     interpolate: interpolate || 0.1,
-    ease: x => x
+    ease: easingFunction || (x => x)
   });
 
   if (trail) {
@@ -121,15 +123,7 @@ export default function PixelTrail({
         {...canvasProps}
         gl={glProps}
         className={`pixel-canvas ${className}`}
-        style={{
-          position: 'fixed',
-          inset: 0,
-          width: '100vw',
-          height: '100vh',
-          zIndex: 0,
-          pointerEvents: 'none',
-          ...(gooeyFilter ? { filter: `url(#${gooeyFilter.id})` } : {})
-        }}
+        style={gooeyFilter && { filter: `url(#${gooeyFilter.id})` }}
       >
         <Scene
           gridSize={gridSize}
