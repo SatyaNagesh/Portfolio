@@ -1,33 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lanyard</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: transparent; }
-    canvas { display: block; width: 100%; height: 100%; }
-  </style>
-</head>
-<body>
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
-  }
-}
-</script>
-<script type="module">
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+
+const container = document.getElementById('lanyard-canvas')
+if (!container) throw new Error('no #lanyard-canvas')
+
+const W = container.clientWidth
+const H = container.clientHeight
 
 const scene = new THREE.Scene()
 scene.background = null
 
-const W = window.innerWidth
-const H = window.innerHeight
 const camera = new THREE.PerspectiveCamera(20, W / H, 0.1, 100)
 camera.position.set(0, 0.8, 30)
 
@@ -36,7 +18,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.setSize(W, H)
 renderer.toneMapping = THREE.ACESFilmicToneMapping
 renderer.toneMappingExposure = 1.2
-document.body.appendChild(renderer.domElement)
+container.appendChild(renderer.domElement)
 
 const ambient = new THREE.AmbientLight(0xffffff, 2.5)
 scene.add(ambient)
@@ -56,7 +38,7 @@ const cardScale = 3.5
 
 let cardGroup = null
 const loader = new GLTFLoader()
-loader.load('./card.glb', (gltf) => {
+loader.load('lanyard/card.glb', (gltf) => {
   const model = gltf.scene
   cardGroup = new THREE.Group()
   cardGroup.scale.set(cardScale, cardScale, cardScale)
@@ -65,17 +47,17 @@ loader.load('./card.glb', (gltf) => {
       child.material = child.material.clone()
       if (child.material.map) {
         const texLoader = new THREE.TextureLoader()
-        texLoader.load('./profile.png', (tex) => {
+        texLoader.load('lanyard/profile.png', (tex) => {
           const baseImg = child.material.map.image
-          const W = baseImg.width
-          const H = baseImg.height
+          const iw = baseImg.width
+          const ih = baseImg.height
           const canvas = document.createElement('canvas')
-          canvas.width = W
-          canvas.height = H
+          canvas.width = iw
+          canvas.height = ih
           const ctx = canvas.getContext('2d')
-          ctx.drawImage(baseImg, 0, 0, W, H)
-          const rw = W * 0.5
-          const rh = H * 0.755
+          ctx.drawImage(baseImg, 0, 0, iw, ih)
+          const rw = iw * 0.5
+          const rh = ih * 0.755
           const s = Math.max(rw / tex.image.width, rh / tex.image.height)
           const dw = tex.image.width * s
           const dh = tex.image.height * s
@@ -104,10 +86,6 @@ loader.load('./card.glb', (gltf) => {
   cardGroup.add(model)
   scene.add(cardGroup)
 })
-
-const lanyardTex = new THREE.TextureLoader().load('./lanyard.png')
-lanyardTex.wrapS = lanyardTex.wrapT = THREE.RepeatWrapping
-lanyardTex.repeat.set(-4, 1)
 
 const segs = 33
 const bandPositions = new Float32Array(segs * 3)
@@ -139,13 +117,19 @@ renderer.domElement.addEventListener('pointerup', () => {
   dragging.active = false
 })
 
-window.addEventListener('resize', () => {
-  const w = window.innerWidth
-  const h = window.innerHeight
-  camera.aspect = w / h
-  camera.updateProjectionMatrix()
-  renderer.setSize(w, h)
-})
+function resize() {
+  const w = container.clientWidth
+  const h = container.clientHeight
+  if (w > 0 && h > 0) {
+    camera.aspect = w / h
+    camera.updateProjectionMatrix()
+    renderer.setSize(w, h)
+  }
+}
+window.addEventListener('resize', resize)
+const ro = new ResizeObserver(resize)
+ro.observe(container)
+setTimeout(resize, 100)
 
 const upVec = new THREE.Vector3(0, 1, 0)
 const tmpQuat = new THREE.Quaternion()
@@ -153,7 +137,6 @@ const tmpQuat = new THREE.Quaternion()
 function animate() {
   requestAnimationFrame(animate)
   const dt = Math.min(0.016, 0.05)
-
   if (dragging.active) {
     connectPos.lerp(pointerWorld, 0.12)
     vel.set(0, 0, 0)
@@ -170,14 +153,12 @@ function animate() {
       if (nv > 0) vel.sub(toAnchor.clone().multiplyScalar(nv))
     }
   }
-
   if (cardGroup) {
     const dirFromAnchor = new THREE.Vector3().copy(anchor).sub(connectPos).normalize()
     cardGroup.position.copy(connectPos).sub(dirFromAnchor.clone().multiplyScalar(cardHangOffset))
     tmpQuat.setFromUnitVectors(upVec, dirFromAnchor)
     cardGroup.quaternion.slerp(tmpQuat, 0.15)
   }
-
   const positions = bandLine.geometry.attributes.position.array
   for (let i = 0; i < segs; i++) {
     const t = i / (segs - 1)
@@ -195,6 +176,3 @@ function animate() {
   renderer.render(scene, camera)
 }
 animate()
-</script>
-</body>
-</html>
