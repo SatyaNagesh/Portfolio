@@ -267,7 +267,7 @@ a { color: inherit; text-decoration: none; }
   min-height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding-top: 80px;
   position: relative;
   overflow: hidden;
@@ -292,9 +292,13 @@ a { color: inherit; text-decoration: none; }
 
 .hero-content {
   max-width: 640px;
+  margin-left: 0;
+  margin-right: auto;
+  padding-left: 10%;
   position: relative;
   z-index: 2;
   pointer-events: none;
+  text-align: left;
 }
 
 .hero-content * {
@@ -304,6 +308,7 @@ a { color: inherit; text-decoration: none; }
 .hero-status {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
   margin-bottom: 20px;
 }
@@ -425,7 +430,7 @@ a { color: inherit; text-decoration: none; }
 .hero-cta {
   display: flex;
   gap: 16px;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
 }
 
