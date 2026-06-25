@@ -273,17 +273,18 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden;
 }
 
-#lanyard-canvas {
+.lanyard-iframe-wrap {
   position: absolute;
   inset: 0;
   z-index: 1;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
-#lanyard-canvas canvas {
+.lanyard-iframe {
   display: block;
-  width: 100% !important;
-  height: 100% !important;
+  width: 100%;
+  height: 100%;
+  border: none;
   pointer-events: auto;
   touch-action: none;
 }
