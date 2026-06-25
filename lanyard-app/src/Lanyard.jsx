@@ -7,6 +7,7 @@ import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphe
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 
 import cardGLB from './card.glb';
+import lanyard from './lanyard.png';
 
 import * as THREE from 'three';
 import './Lanyard.css';
@@ -113,31 +114,7 @@ function Band({
     dir = new THREE.Vector3();
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 };
   const { nodes, materials } = useGLTF(cardGLB);
-  const texture = useMemo(() => {
-    if (lanyardImage) return useTexture(lanyardImage);
-    const canvas = document.createElement('canvas');
-    canvas.width = 64;
-    canvas.height = 64;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#555';
-    ctx.fillRect(0, 0, 64, 64);
-    for (let i = -64; i < 128; i += 8) {
-      ctx.strokeStyle = '#777';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(i, 0);
-      ctx.lineTo(i + 16, 64);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(i, 0);
-      ctx.lineTo(i + 12, 64);
-      ctx.stroke();
-    }
-    const tex = new THREE.CanvasTexture(canvas);
-    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    tex.needsUpdate = true;
-    return tex;
-  }, [lanyardImage]);
+  const texture = useTexture(lanyardImage || lanyard);
   const frontTex = useTexture(frontImage || BLANK_PIXEL);
   const backTex = useTexture(backImage || BLANK_PIXEL);
 
