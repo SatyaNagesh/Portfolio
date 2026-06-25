@@ -542,16 +542,7 @@ a { color: inherit; text-decoration: none; }
 
 .skill-category {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
   padding: 28px;
-  transition: var(--transition);
-}
-
-.skill-category:hover {
-  border-color: var(--border-light);
-  box-shadow: var(--glow-soft);
-  transform: translateY(-2px);
 }
 
 .skill-category h3 {
@@ -746,15 +737,7 @@ a { color: inherit; text-decoration: none; }
 
 .about-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
   padding: 32px;
-  transition: var(--transition);
-}
-
-.about-card:hover {
-  border-color: rgba(255,255,255,0.1);
-  transform: translateY(-2px);
 }
 
 .about-icon {
@@ -833,8 +816,6 @@ a { color: inherit; text-decoration: none; }
 
 .timeline-content {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
   padding: 28px;
 }
 
@@ -912,22 +893,13 @@ a { color: inherit; text-decoration: none; }
   gap: 12px;
   padding: 28px 16px;
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
   color: var(--text-muted);
   font-family: var(--font-heading);
   font-size: 0.7rem;
-  transition: var(--transition);
   text-decoration: none;
 }
 
-.contact-card svg {
-  transition: var(--transition);
-}
-
 .contact-card:hover {
-  border-color: rgba(255,255,255,0.12);
-  transform: translateY(-4px);
   color: var(--text-primary);
 }
 
@@ -1275,13 +1247,25 @@ a { color: inherit; text-decoration: none; }
   --cursor-angle: 45deg;
   --edge-sensitivity: 30;
   --color-sensitivity: calc(var(--edge-sensitivity) + 20);
+  --border-radius: 12px;
   --glow-padding: 40px;
   --cone-spread: 25;
 
   position: relative;
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   isolation: isolate;
+  transform: translate3d(0, 0, 0.01px);
+  display: grid;
+  border: 1px solid rgb(255 255 255 / 15%);
+  background: var(--card-bg, #1A1A1A);
   overflow: visible;
+  box-shadow:
+    rgba(0, 0, 0, 0.1) 0px 1px 2px,
+    rgba(0, 0, 0, 0.1) 0px 2px 4px,
+    rgba(0, 0, 0, 0.1) 0px 4px 8px,
+    rgba(0, 0, 0, 0.1) 0px 8px 16px,
+    rgba(0, 0, 0, 0.1) 0px 16px 32px,
+    rgba(0, 0, 0, 0.1) 0px 32px 64px;
 }
 
 .glow-card-wrapper::before,
@@ -1315,7 +1299,7 @@ a { color: inherit; text-decoration: none; }
     var(--gradient-five) border-box,
     var(--gradient-six) border-box,
     var(--gradient-seven) border-box,
-    var(--gradient-base, linear-gradient(#777 0 100%)) border-box;
+    var(--gradient-base) border-box;
 
   opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
 
@@ -1338,6 +1322,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .glow-card-wrapper::after {
+  border: 1px solid transparent;
   background:
     var(--gradient-one) padding-box,
     var(--gradient-two) padding-box,
@@ -1346,12 +1331,30 @@ a { color: inherit; text-decoration: none; }
     var(--gradient-five) padding-box,
     var(--gradient-six) padding-box,
     var(--gradient-seven) padding-box,
-    var(--gradient-base, linear-gradient(#777 0 100%)) padding-box;
+    var(--gradient-base) padding-box;
 
-  mask-image: radial-gradient(ellipse at 50% 50%, transparent 50%, black 75%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, transparent 50%, black 75%);
-  opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
-  mix-blend-mode: plus-lighter;
+  mask-image:
+    linear-gradient(to bottom, black, black),
+    radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
+    radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
+    radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
+    radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
+    radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
+    conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
+  -webkit-mask-image:
+    linear-gradient(to bottom, black, black),
+    radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
+    radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
+    radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
+    radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
+    radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
+    conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
+
+  mask-composite: subtract, add, add, add, add, add;
+  -webkit-mask-composite: source-over, add, add, add, add, add;
+
+  opacity: calc(var(--fill-opacity, 0.35) * (var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+  mix-blend-mode: soft-light;
 }
 
 .glow-card-wrapper > .edge-light {
