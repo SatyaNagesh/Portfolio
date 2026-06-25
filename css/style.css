@@ -273,14 +273,15 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden;
 }
 
-.lanyard-iframe-wrap {
+.lanyard-canvas-wrap {
   position: absolute;
   inset: 0;
+  height: 100vh;
   z-index: 1;
   pointer-events: none;
 }
 
-.lanyard-iframe {
+.lanyard-canvas-frame {
   display: block;
   width: 100%;
   height: 100%;

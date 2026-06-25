@@ -6,7 +6,7 @@ import './Lanyard.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <Lanyard
-    position={[0, 0, 30]}
+    position={[0, 0, 18]}
     gravity={[0, -40, 0]}
     frontImage={profile}
   />
