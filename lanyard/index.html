@@ -22,7 +22,6 @@
 <script type="module">
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
 const scene = new THREE.Scene()
 scene.background = null
@@ -48,17 +47,20 @@ dir3.position.set(0, 0, 10)
 scene.add(dir3)
 
 const anchor = new THREE.Vector3(0, 2.8, 0)
-const ropeLen = 2.4
-const pos = new THREE.Vector3(0.5, anchor.y - ropeLen, 0)
+const ropeLen = 2.8
+const cardHangOffset = 0.9
+const pos = new THREE.Vector3(0.2, anchor.y - ropeLen, 0)
 const vel = new THREE.Vector3(0, 0, 0)
+const cardScale = 3.5
+const upVec = new THREE.Vector3(0, 1, 0)
+const tmpQuat = new THREE.Quaternion()
 
 let cardGroup = null
 const loader = new GLTFLoader()
 loader.load('./card.glb', (gltf) => {
   const model = gltf.scene
   cardGroup = new THREE.Group()
-  cardGroup.scale.set(2.25, 2.25, 2.25)
-  cardGroup.position.copy(pos)
+  cardGroup.scale.set(cardScale, cardScale, cardScale)
   model.traverse((child) => {
     if (child.isMesh) {
       child.material = child.material.clone()
@@ -77,9 +79,9 @@ loader.load('./card.glb', (gltf) => {
           const ry = 0
           const rw = W * 0.5
           const rh = H * 0.755
-          const scale = Math.max(rw / tex.image.width, rh / tex.image.height)
-          const dw = tex.image.width * scale
-          const dh = tex.image.height * scale
+          const s = Math.max(rw / tex.image.width, rh / tex.image.height)
+          const dw = tex.image.width * s
+          const dh = tex.image.height * s
           const dx = rx + (rw - dw) / 2
           const dy = ry + (rh - dh) / 2
           ctx.save()
@@ -164,9 +166,10 @@ function animate() {
     }
   }
   if (cardGroup) {
-    cardGroup.position.copy(pos)
-    const look = new THREE.Vector3().copy(anchor).lerp(pos, 0.3)
-    cardGroup.lookAt(look)
+    const cardCenter = new THREE.Vector3().copy(anchor).sub(pos).normalize()
+    cardGroup.position.copy(pos).sub(cardCenter.clone().multiplyScalar(cardHangOffset))
+    tmpQuat.setFromUnitVectors(upVec, cardCenter)
+    cardGroup.quaternion.slerp(tmpQuat, 0.15)
   }
   const positions = bandLine.geometry.attributes.position.array
   for (let i = 0; i < segs; i++) {
