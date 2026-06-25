@@ -4,24 +4,6 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* --- Cursor Glow --- */
-  const cursorGlow = document.getElementById('cursorGlow');
-  let cursorX = -200, cursorY = -200;
-  let glowX = -200, glowY = -200;
-
-  document.addEventListener('mousemove', (e) => {
-    cursorX = e.clientX;
-    cursorY = e.clientY;
-  });
-
-  function animateGlow() {
-    glowX += (cursorX - glowX) * 0.08;
-    glowY += (cursorY - glowY) * 0.08;
-    cursorGlow.style.transform = `translate(${glowX - 200}px, ${glowY - 200}px)`;
-    requestAnimationFrame(animateGlow);
-  }
-  animateGlow();
-
   /* --- Mobile Nav Toggle --- */
   const navToggle = document.getElementById('navToggle');
   const navLinks = document.getElementById('navLinks');
