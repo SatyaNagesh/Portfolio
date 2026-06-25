@@ -11,7 +11,7 @@ const scene = new THREE.Scene()
 scene.background = null
 
 const camera = new THREE.PerspectiveCamera(20, W / H, 0.1, 100)
-camera.position.set(0, 1.2, 30)
+camera.position.set(0, 2, 30)
 
 const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -29,12 +29,12 @@ const dir2 = new THREE.DirectionalLight(0xffffff, 1.5)
 dir2.position.set(-5, -5, 5)
 scene.add(dir2)
 
-const anchor = new THREE.Vector3(0, 6.2, 0)
-const ropeLen = 5.2
+const anchor = new THREE.Vector3(0, 12, 0)
+const ropeLen = 10.5
 const cardHangOffset = 1.0
-const connectPos = new THREE.Vector3(0.2, anchor.y - ropeLen, 0)
+const connectPos = new THREE.Vector3(0, anchor.y - ropeLen, 0)
 const vel = new THREE.Vector3(0, 0, 0)
-const cardScale = 3.8
+const cardScale = 4.0
 
 let cardGroup = null
 const loader = new GLTFLoader()
