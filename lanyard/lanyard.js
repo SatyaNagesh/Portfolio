@@ -31,7 +31,7 @@ scene.add(dir2)
 
 const anchor = new THREE.Vector3(0, 12, 0)
 const ropeLen = 10.5
-const cardHangOffset = 1.0
+const cardHangOffset = 2.8
 const connectPos = new THREE.Vector3(0, anchor.y - ropeLen, 0)
 const vel = new THREE.Vector3(0, 0, 0)
 const cardScale = 4.0
@@ -87,7 +87,7 @@ loader.load('lanyard/card.glb', (gltf) => {
   scene.add(cardGroup)
 })
 
-const tubeRadius = 0.035
+const tubeRadius = 0.08
 const tubeMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.6, metalness: 0.1 })
 let tubeMesh = null
 
