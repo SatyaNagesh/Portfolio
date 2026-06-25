@@ -142,10 +142,15 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.setProperty(`--gradient-${gKeys[i]}`, `radial-gradient(at ${positions[i]}, ${c} 0px, transparent 50%)`);
       }
       wrapper.style.setProperty('--gradient-base', 'linear-gradient(#0A0A0A 0 100%)');
-      wrapper.style.setProperty('--color-sensitivity', '10');
+      wrapper.style.setProperty('--color-sensitivity', '20');
+      wrapper.style.setProperty('--edge-sensitivity', '20');
+      wrapper.style.setProperty('--glow-padding', '40');
+      wrapper.style.setProperty('--cone-spread', String(config.coneSpread));
+      wrapper.style.borderRadius = '20px';
 
       const edgeLight = document.createElement('span');
       edgeLight.className = 'edge-light';
+      edgeLight.style.borderRadius = '20px';
       wrapper.appendChild(edgeLight);
 
       wrapper.addEventListener('pointermove', (e) => {
@@ -173,9 +178,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* Apply BorderGlow to cards */
   function applyGlowToCards() {
-    initBorderGlow('.skill-category', { colors: ['#c084fc', '#f472b6', '#38bdf8'], glowColor: '270 80 65', glowIntensity: 1.5, fillOpacity: 0.5 });
-    initBorderGlow('.about-card', { colors: ['#c084fc', '#f472b6', '#38bdf8'], glowColor: '270 80 65', glowIntensity: 1.5, fillOpacity: 0.5 });
-    initBorderGlow('.contact-card', { colors: ['#c084fc', '#f472b6', '#38bdf8'], glowColor: '270 80 65', glowIntensity: 1.5, fillOpacity: 0.5 });
+    initBorderGlow('.skill-category', {
+      colors: ['#c084fc', '#f472b6', '#38bdf8'],
+      glowColor: '0 0 85',
+      glowIntensity: 1,
+      coneSpread: 25
+    });
+    initBorderGlow('.about-card', {
+      colors: ['#c084fc', '#f472b6', '#38bdf8'],
+      glowColor: '0 0 85',
+      glowIntensity: 1,
+      coneSpread: 25
+    });
+    initBorderGlow('.contact-card', {
+      colors: ['#c084fc', '#f472b6', '#38bdf8'],
+      glowColor: '0 0 85',
+      glowIntensity: 1,
+      coneSpread: 25
+    });
   }
   setTimeout(applyGlowToCards, 100);
 });
