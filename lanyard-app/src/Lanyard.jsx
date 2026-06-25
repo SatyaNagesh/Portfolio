@@ -107,7 +107,8 @@ function Band({
     j1 = useRef(),
     j2 = useRef(),
     j3 = useRef(),
-    card = useRef();
+    card = useRef(),
+    cardGroup = useRef();
   const vec = new THREE.Vector3(),
     ang = new THREE.Vector3(),
     rot = new THREE.Vector3(),
@@ -214,6 +215,12 @@ function Band({
       rot.copy(card.current.rotation());
       card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
     }
+    if (cardGroup.current) {
+      const target = hovered ? 2.5 : 2.25;
+      cardGroup.current.scale.x += (target - cardGroup.current.scale.x) * 0.1;
+      cardGroup.current.scale.y += (target - cardGroup.current.scale.y) * 0.1;
+      cardGroup.current.scale.z += (target - cardGroup.current.scale.z) * 0.1;
+    }
   });
 
   curve.curveType = 'chordal';
@@ -235,6 +242,7 @@ function Band({
         <RigidBody position={[2, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
           <CuboidCollider args={[0.8, 1.125, 0.01]} />
           <group
+            ref={cardGroup}
             scale={2.25}
             position={[0, -1.2, -0.05]}
             onPointerOver={() => hover(true)}
