@@ -6,7 +6,7 @@
   var color = '#b1b0b5';
   var gooeyStrength = 2;
 
-  var pixelSize = Math.round(gridSize * trailSize);
+  var pixelSize = 40;
   var smoothFactor = 1 / interpolate;
 
   var TRAIL_RES = 256;
