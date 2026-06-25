@@ -141,6 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const c = config.colors[Math.min(colorMap[i], config.colors.length - 1)];
         wrapper.style.setProperty(`--gradient-${gKeys[i]}`, `radial-gradient(at ${positions[i]}, ${c} 0px, transparent 50%)`);
       }
+      wrapper.style.setProperty('--gradient-base', 'linear-gradient(#0A0A0A 0 100%)');
+      wrapper.style.setProperty('--color-sensitivity', '10');
 
       const edgeLight = document.createElement('span');
       edgeLight.className = 'edge-light';

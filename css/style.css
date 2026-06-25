@@ -1297,7 +1297,6 @@ a { color: inherit; text-decoration: none; }
 }
 
 .glow-card-wrapper:not(:hover):not(.sweep-active)::before,
-.glow-card-wrapper:not(:hover):not(.sweep-active)::after,
 .glow-card-wrapper:not(:hover):not(.sweep-active) > .edge-light {
   opacity: 0;
   transition: opacity 0.75s ease-in-out;
@@ -1317,7 +1316,7 @@ a { color: inherit; text-decoration: none; }
     var(--gradient-seven) border-box,
     var(--gradient-base, linear-gradient(#777 0 100%)) border-box;
 
-  opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+  opacity: calc(0.1 + 0.5 * (var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
 
   mask-image:
     conic-gradient(
@@ -1367,7 +1366,7 @@ a { color: inherit; text-decoration: none; }
 
   mask-composite: subtract, add, add, add, add, add;
   -webkit-mask-composite: xor, add, add, add, add, add;
-  opacity: calc(var(--fill-opacity, 0.35) * (var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+  opacity: calc(0.15 + 0.6 * var(--edge-proximity) / 100);
   mix-blend-mode: plus-lighter;
 }
 
