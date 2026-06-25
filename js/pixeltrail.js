@@ -1,24 +1,54 @@
 (function() {
-  const gridSize = 50;
-  const color = '#b1b0b5';
+  var gridSize = 45;
+  var pixelSize = 4;
+  var trailDotRadius = 24;
+  var fadeRate = 0.05;
+  var interpolate = 0.15;
+  var color = '#b1b0b5';
 
-  const canvas = document.createElement('canvas');
+  var canvas = document.createElement('canvas');
   canvas.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;display:block';
   document.body.insertBefore(canvas, document.body.firstChild);
 
-  const ctx = canvas.getContext('2d');
+  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.style.cssText = 'position:fixed;inset:0;width:0;height:0;overflow:hidden;z-index:0';
+  var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  var filter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+  filter.id = 'trail-goo';
+  var fb = document.createElementNS('http://www.w3.org/2000/svg', 'feGaussianBlur');
+  fb.setAttribute('in', 'SourceGraphic'); fb.setAttribute('stdDeviation', '2.5'); fb.setAttribute('result', 'blur');
+  var fc = document.createElementNS('http://www.w3.org/2000/svg', 'feColorMatrix');
+  fc.setAttribute('in', 'blur'); fc.setAttribute('type', 'matrix');
+  fc.setAttribute('values', '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10');
+  fc.setAttribute('result', 'goo');
+  var fcomp = document.createElementNS('http://www.w3.org/2000/svg', 'feComposite');
+  fcomp.setAttribute('in', 'SourceGraphic'); fcomp.setAttribute('in2', 'goo'); fcomp.setAttribute('operator', 'atop');
+  filter.appendChild(fb); filter.appendChild(fc); filter.appendChild(fcomp);
+  defs.appendChild(filter); svg.appendChild(defs);
+  document.body.insertBefore(svg, document.body.firstChild);
+  canvas.style.filter = 'url(#trail-goo)';
 
-  let W, H, mx = -1000, my = -1000;
+  var ctx = canvas.getContext('2d');
+  var trailCanvas = document.createElement('canvas');
+  var tctx = trailCanvas.getContext('2d');
+
+  var W, H, dpr = window.devicePixelRatio || 1;
+  var mx = -1000, my = -1000, sx = -1000, sy = -1000;
+  var cols, rows;
 
   function resize() {
-    const dpr = devicePixelRatio || 1;
     W = window.innerWidth;
     H = window.innerHeight;
     canvas.width = W * dpr;
     canvas.height = H * dpr;
     canvas.style.width = W + 'px';
     canvas.style.height = H + 'px';
-    ctx.scale(dpr, dpr);
+    trailCanvas.width = W;
+    trailCanvas.height = H;
+    cols = Math.ceil(W / gridSize);
+    rows = Math.ceil(H / gridSize);
+    tctx.fillStyle = 'rgba(0,0,0,1)';
+    tctx.fillRect(0, 0, W, H);
   }
   resize();
   window.addEventListener('resize', resize);
@@ -27,60 +57,58 @@
     mx = e.clientX;
     my = e.clientY;
   });
-
   document.addEventListener('touchmove', function(e) {
     var t = e.touches[0];
     mx = t.clientX;
     my = t.clientY;
   }, { passive: true });
-
   document.addEventListener('touchend', function() {
     mx = -1000;
     my = -1000;
   }, { passive: true });
 
   function frame() {
+    if (sx < -500) {
+      sx = mx;
+      sy = my;
+    } else {
+      sx += (mx - sx) * interpolate;
+      sy += (my - sy) * interpolate;
+    }
+
+    tctx.fillStyle = 'rgba(0,0,0,' + fadeRate + ')';
+    tctx.fillRect(0, 0, W, H);
+
+    if (sx > 0 && sy > 0) {
+      tctx.fillStyle = '#ffffff';
+      tctx.beginPath();
+      tctx.arc(sx, sy, trailDotRadius, 0, Math.PI * 2);
+      tctx.fill();
+    }
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
 
-    if (mx < 0 || my < 0) {
-      requestAnimationFrame(frame);
-      return;
-    }
+    var imageData = tctx.getImageData(0, 0, W, H);
+    var data = imageData.data;
 
     ctx.fillStyle = color;
-
-    var gx = Math.round(mx / gridSize) * gridSize;
-    var gy = Math.round(my / gridSize) * gridSize;
-
-    var dist = Math.sqrt(Math.pow(mx - gx, 2) + Math.pow(my - gy, 2));
-    var maxDist = gridSize * 0.6;
-    var intensity = Math.max(0, 1 - dist / maxDist);
-    intensity = Math.min(intensity * 1.5, 1);
-
-    if (intensity > 0.05) {
-      ctx.globalAlpha = intensity * 0.8;
-      var s = 2 + intensity * 4;
-      ctx.fillRect(gx - s / 2, gy - s / 2, s, s);
-    }
-
-    var nearby = 2;
-    for (var dy = -nearby; dy <= nearby; dy++) {
-      for (var dx = -nearby; dx <= nearby; dx++) {
-        if (dx === 0 && dy === 0) continue;
-        var nx = gx + dx * gridSize;
-        var ny = gy + dy * gridSize;
-        if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
-        var d2 = Math.sqrt(Math.pow(mx - nx, 2) + Math.pow(my - ny, 2));
-        var i2 = Math.max(0, 1 - d2 / (gridSize * 2));
-        if (i2 > 0.05) {
-          ctx.globalAlpha = i2 * 0.5;
-          var s2 = Math.max(1, i2 * 3);
-          ctx.fillRect(nx - s2 / 2, ny - s2 / 2, s2, s2);
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var gx = c * gridSize + gridSize / 2;
+        var gy = r * gridSize + gridSize / 2;
+        var idx = (Math.round(gy) * W + Math.round(gx)) * 4;
+        if (idx >= 0 && idx < data.length) {
+          var brightness = data[idx] / 255;
+          if (brightness > 0.02) {
+            ctx.globalAlpha = Math.min(brightness * 0.9, 0.9);
+            ctx.fillRect(gx - pixelSize / 2, gy - pixelSize / 2, pixelSize, pixelSize);
+          }
         }
       }
     }
-
     ctx.globalAlpha = 1;
+
     requestAnimationFrame(frame);
   }
 
