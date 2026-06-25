@@ -28,16 +28,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (navToggle) {
     navToggle.addEventListener('click', () => {
-      const isOpen = navLinks.classList.toggle('open');
-      navToggle.classList.toggle('open');
-      navToggle.setAttribute('aria-expanded', isOpen);
+      const gooeyWrap = document.querySelector('.gooey-nav-wrap');
+      if (gooeyWrap) {
+        const isOpen = gooeyWrap.classList.toggle('open');
+        navToggle.classList.toggle('open');
+        navToggle.setAttribute('aria-expanded', isOpen);
+      }
     });
   }
 
   /* Close nav on link click */
-  document.querySelectorAll('.nav-link').forEach(link => {
+  document.querySelectorAll('.gooey-nav ul li a').forEach(link => {
     link.addEventListener('click', () => {
-      navLinks.classList.remove('open');
+      const gooeyWrap = document.querySelector('.gooey-nav-wrap');
+      if (gooeyWrap) gooeyWrap.classList.remove('open');
       navToggle.classList.remove('open');
       navToggle.setAttribute('aria-expanded', 'false');
     });
@@ -64,11 +68,46 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    const activeLi = document.querySelector(`.gooey-nav ul li a[href="#${current}"]`)?.closest('li');
+    if (activeLi) {
+      const idx = Array.from(document.querySelectorAll('.gooey-nav ul li')).indexOf(activeLi);
+      if (idx >= 0 && gooeyNavWrap) {
+        gooeyNavWrap._gooeySetActive(idx);
+      }
+    }
+
     navbar.classList.toggle('scrolled', window.scrollY > 60);
   }
 
   window.addEventListener('scroll', updateNav, { passive: true });
   updateNav();
+
+  /* --- GooeyNav --- */
+  const navUl = document.getElementById('navLinks');
+  let gooeyNavWrap = null;
+  if (navUl) {
+    gooeyNavWrap = initGooeyNav(navUl.parentElement, {
+      onActiveChange: (index) => {
+        const lis = navUl.querySelectorAll('li');
+        const link = lis[index]?.querySelector('a');
+        if (link) {
+          const href = link.getAttribute('href');
+          if (href?.startsWith('#')) {
+            navAnchors.forEach(a => a.classList.toggle('active', a.getAttribute('href') === href));
+          }
+        }
+      }
+    });
+
+    navUl.querySelectorAll('li a').forEach(a => {
+      a.addEventListener('click', () => {
+        const gw = document.querySelector('.gooey-nav-wrap');
+        if (gw) gw.classList.remove('open');
+        navToggle.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
 
   /* --- Reveal Animation on Scroll --- */
   const revealElements = document.querySelectorAll('[data-reveal]');
