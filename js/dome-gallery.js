@@ -647,7 +647,7 @@ function initProjectDome(projectData) {
     grayscale: true,
     maxVerticalRotationDeg: 20,
     dragDampening: 3.6,
-    minRadius: 400,
+    minRadius: 750,
     openedImageWidth: '420px',
     openedImageHeight: '340px',
   });
