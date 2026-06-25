@@ -1,7 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import Lanyard from './Lanyard'
+import './Lanyard.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <Lanyard />
+  <Lanyard
+    position={[0, 0, 30]}
+    gravity={[0, -40, 0]}
+    frontImage="./profile.png"
+  />
 )
