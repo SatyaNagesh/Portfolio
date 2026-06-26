@@ -2,7 +2,8 @@ import { createRoot } from 'react-dom/client'
 import PixelTrail from './PixelTrail'
 import './PixelTrail.css'
 
-<div style={{ height: '500px', position: 'relative', overflow: 'hidden'}}>
+createRoot(document.getElementById('root')).render(
+  <div style={{ height: '500px', position: 'relative', overflow: 'hidden'}}>
     <PixelTrail
       gridSize={200}
       trailSize={0.1}
