@@ -1399,13 +1399,3 @@ a { color: inherit; text-decoration: none; }
   }
 }
 
-.goo-filter-container {
-  position: absolute;
-  overflow: hidden;
-  z-index: 1;
-}
-
-.pixel-canvas {
-  position: absolute;
-  z-index: 1;
-}
