@@ -1,12 +1,12 @@
 (function() {
-  var gridSize = 10;
-  var trailSize = 0.1;
+  var gridSize = 5;
+  var trailSize = 0.25;
   var maxAge = 500;
   var interpolate = 2;
   var color = '#b1b0b5';
   var gooeyStrength = 2;
 
-  var pixelSize = 10;
+  var pixelSize = 5;
   var smoothFactor = 1 / interpolate;
 
   var TRAIL_RES = 256;
