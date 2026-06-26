@@ -4,10 +4,10 @@ import './PixelTrail.css'
 
 <div style={{ height: '500px', position: 'relative', overflow: 'hidden'}}>
     <PixelTrail
-      gridSize={50}
+      gridSize={60}
       trailSize={0.1}
-      maxAge={250}
-      interpolate={5}
+      maxAge={400}
+      interpolate={2.5}
       color="#b1b0b5"
       gooeyFilter={{ id: "custom-goo-filter", strength: 2 }}
       gooeyEnabled
